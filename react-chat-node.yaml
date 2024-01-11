@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: react-chat-node-deployment
+    labels:
+        app: react-chat-node
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: react-chat-node
+    template:
+        metadata:
+            labels:
+                app: react-chat-node
+        spec:
+            containers:
+                - name: react-chat-node-container
+                  image: adityaku1997/react-chat-node:1.0.0
+                  imagePullPolicy: 'Always'
+                  ports:
+                      - containerPort: 3100
+                  env:
+                      - name: OPENAI_API_KEY
+                        valueFrom:
+                            secretKeyRef:
+                                name: open-api-secret
+                                key: API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: react-chat-node-service
+spec:
+    selector:
+        app: react-chat-node
+    type: ClusterIP
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 3100
